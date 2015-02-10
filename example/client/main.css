@@ -1,0 +1,20 @@
+.draggable {
+  border: 1px solid black;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  text-align: center;
+  top: 20px;
+  left: 40px;
+  padding: 5px;
+  margin: 5px;
+}
+
+html, body, .everything {
+  height: 100%;
+  width: 100%;
+}
+
+* {
+  user-select: none;
+}
