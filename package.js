@@ -1,7 +1,7 @@
 Package.describe({
   name: 'ccorcos:tracker-streams',
-  summary: 'Observable streams baked into Tracker.',
-  version: '0.0.1',
+  summary: 'Observable streams using Tracker.',
+  version: '1.0.0',
   git: 'https://github.com/ccorcos/meteor-tracker-streams'
 });
 
@@ -18,7 +18,7 @@ Package.onUse(function(api) {
   ], 'client');
 
   api.addFiles([
-    'lib/streams.coffee',
+    'lib/stream.coffee',
   ], 'client');
 
 });
