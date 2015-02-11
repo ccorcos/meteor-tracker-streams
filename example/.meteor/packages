@@ -10,3 +10,4 @@ insecure
 coffeescript
 reactive-var
 ccorcos:tracker-streams
+anti:fake

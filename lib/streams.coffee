@@ -1,5 +1,6 @@
 
 debug = (args...) -> return #console.log.apply(console, args)
+delay = (ms, func) -> Meteor.setTimeout(func, ms)
 
 # for arrays, stream needs .next(value) and .error(value)
 # subscribers thus need an "onError" optional callback as well as the onNext
@@ -8,9 +9,13 @@ Tracker.stream = (initialValue=undefined) ->
   if not (this instanceof Tracker.stream) then return new Tracker.stream(initialValue)
   @subscribers = []
   @subscription = undefined
-  @value = new ReactiveVar(initialValue)
-  @error = new ReactiveVar(undefined)
+  # make sure we always reactive depend even when
+  # we see the same value twice! Thus the second 
+  # arguement is the equalsFunction
+  @value = new ReactiveVar(initialValue, -> false)
+  @error = new ReactiveVar(undefined, -> false)
   return this
+
 
 Tracker.stream::completed = () ->
   @subscription?.stop()
@@ -27,13 +32,47 @@ Tracker.stream::map = (func) ->
       nextStream.value.set(func(value))
   return nextStream
 
+Tracker.stream::throttle = (ms) ->
+  self = this
+  nextStream = new Tracker.stream()
+  @subscribers.push(nextStream)
+
+  waiting = false
+  waitingValue = undefined
+  wait = ->
+    waiting = true
+    waitingValue = undefined
+    debug "start waiting"
+    delay ms, ->
+      if waitingValue isnt undefined
+        nextStream.value.set(waitingValue)
+        debug "wait again"
+        wait()
+      else
+        waiting = false
+        debug "done waiting"
+
+  nextStream.subscription = Tracker.autorun -> 
+    value = self.value.get()
+    if value isnt undefined
+      if waiting
+        debug "queue value"
+        waitingValue = value
+      else
+        waitingValue = undefined
+        debug "set value"
+        nextStream.value.set(value)
+        wait()
+
+  return nextStream
+
 Tracker.stream::filter = (func) ->
   self = this
   nextStream = new Tracker.stream()
   @subscribers.push(nextStream)
   nextStream.subscription = Tracker.autorun -> 
     value = self.value.get()
-    if func(value)
+    if value isnt undefined and func(value)
       nextStream.value.set(value)
   return nextStream
 
@@ -94,10 +133,23 @@ Tracker.eventStream = (eventName, element) ->
 Blaze.TemplateInstance.prototype.eventStream = (eventName, elementSelector) ->
   unless @eventStreams isnt undefined
     @eventStreams = []
-  element = @$(elementSelector)
-  stream = Tracker.eventStream(eventName, element)
-  @eventStreams.push(stream)
-  return stream
+
+  if @view.isRendered
+    element = @$(elementSelector)
+    stream = Tracker.eventStream(eventName, element)
+    @eventStreams.push(stream)
+    return stream
+  else
+    stream = new Tracker.stream()
+    evtMap = {}
+    evtMap["#{eventName} #{elementSelector}"] = (e,t) ->
+      stream.value.set(e)
+    @view.template.events(evtMap)
+    @eventStreams.push(stream)
+    return stream
+
+
+  
 
 Template.onDestroyed ->
   _.map(@eventStreams, (stream) -> stream.completed())

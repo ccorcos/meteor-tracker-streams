@@ -2,19 +2,46 @@
   border: 1px solid black;
   width: 100px;
   height: 100px;
+  line-height: 100px;
+  background-color: white;
   position: absolute;
   text-align: center;
-  top: 20px;
+  top: 100px;
   left: 40px;
   padding: 5px;
   margin: 5px;
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+
+  /* No support for these yet, use at own risk */
+  -o-user-select: none;
+  user-select: none;   
 }
 
-html, body, .everything {
+html, body {
   height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+.everything {
+  height: calc(100% - 90px);
   width: 100%;
 }
 
-* {
-  user-select: none;
+.switch {
+  width: 100%;
+  text-align: center;
+  height: 70px;
+  background-color: black;
+  color: white;
+  line-height: 70px;
+}
+
+input {
+  font-size: 16px;
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 20px;
 }

@@ -8,6 +8,8 @@ If you haven't heard about observable streams, then [check out this talk](https:
 
 Right now, these aren't truely observable streams because there arent any arrays. But it works right now for the click and drag example...
 
+http://jhusain.github.io/learnrx/
+
 <!-- Observable streams are often thought of as asynchronous arrays.
 Here, they are slightly differnt because we are never accumulating
 values. Basically, we just have a reactive variable in each stream
@@ -19,4 +21,6 @@ as well so we can stop all of them when a stream has completed. -->
 - reactive arrays
 - error propagation
 - use [transducers](http://jlongster.com/Transducers.js--A-JavaScript-Library-for-Transformation-of-Data)
+
+
 

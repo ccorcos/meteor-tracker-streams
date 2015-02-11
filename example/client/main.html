@@ -3,7 +3,25 @@
 </body>
 
 <template name="main">
+  <div class="switch">Other Example</div>
+  {{#if sessionVarEq 'example' 'drag'}}
+    {{>drag}}
+  {{else}}
+    {{>typeahead}}
+  {{/if}}
+</template>
+
+<template name="drag">
   <div class="everything">
     <div class="draggable">drag me</div>
   </div>
+</template>
+
+<template name="typeahead">
+  <input type="text" class="typeahead" placeholder="typeahead box">
+  <ul>
+    {{#each matches}}
+      <li>{{name}}</li>
+    {{/each}}
+  </ul>
 </template>
