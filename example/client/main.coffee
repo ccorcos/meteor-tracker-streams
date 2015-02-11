@@ -1,8 +1,6 @@
-# Session.setDefault('example', 'drag')
-Session.setDefault('example', 'typeahead')
-
+# Toggle between examples
+Session.setDefault('example', 'drag')
 Template.registerHelper 'sessionVarEq', (string, value) -> Session.equals(string, value)
-
 Template.main.events
   'click .switch': (e,t) ->
     state = Session.get('example')
@@ -12,6 +10,9 @@ Template.main.events
       Session.set('example', 'drag')
 
 
+# Drag a DOM element using a stream. It would probably be better to
+# user translate3d to use the GPU or VelocityJS but for the sake of
+# exmaple, we're using abosolute positioning.
 Template.drag.rendered = ->
   mouseDown = @eventStream("mousedown", ".draggable")
   mouseUp   = @eventStream("mouseup", ".draggable")
@@ -27,12 +28,16 @@ Template.drag.rendered = ->
         pos = {top: e.pageY, left: e.pageX}
         $elem.css({top: pos.top + initOffset.top, left: pos.left + initOffset.left})
 
-People = new Mongo.Collection(null)
 
+
+# Some random people to search for...
+People = new Mongo.Collection(null)
 for i in [0...1000]
   People.insert({name: Fake.word()})
 
-
+# In the typeahead example, we are reactively updating a list based on
+# what is typed. The beauty of this is that we dont have to maintain any
+# state outside of the template helper
 Template.typeahead.created =  ->
   @keyUp = @eventStream("keyup", ".typeahead")
 
