@@ -1,6 +1,6 @@
 # Tracker Streams
 
-This package uses Tracker to build "observable streams" for Meteor. 
+This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com).
 
 If you haven't heard about observable streams, then [check out this talk](https://www.youtube.com/watch?v=XRYN2xt11Ek).
 For a more hands-on introduction, check out [this interactive tutorial](http://jhusain.github.io/learnrx/).
@@ -105,7 +105,7 @@ we didn't have to throttle the results in the template logic. In a large templat
 it could become a hassle to trace how the internal state changes with respect
 to events ([again, some code I'm not very proud of](https://github.com/ccorcos/meteor-swipe/blob/3f1efdff1f1e1280d46f2715496df0f21a353cb8/swipe/swipe.coffee#L325)). 
 With observable streams, we can eliminate state with more declarative asynchronous
-code.
+code. [Check out these examples in action](http://tracker-streams.meteor.com).
 
 ## Implementation Details
 
@@ -122,7 +122,7 @@ computation for a stream's subscription and all of its subscribers.
     I haven't come up with a good example to use this yet, but when I do
     I will implement them.
 
-- use [transducers](http://jlongster.com/Transducers.js--A-JavaScript-Library-for-Transformation-of-Data) for high order functions.
+- use [transducers](http://jlongster.com/Transducers.js--A-JavaScript-Library-for-Transformation-of-Data) to create more high order functions.
 
     It would be sweet to recreate underscore or lodash at the same time ;)
 
