@@ -46,9 +46,10 @@ Template.typeahead.helpers
     t = Template.instance()
     
     searchStream = t.keyUp
-      .map (e) -> e.key
-      # non alphanumeric keys are things like "Backspace", etc.
-      .filter (key) -> key?.length is 1 or key is "Backspace"
+      .map (e) -> e.which
+      # filter for the relevant keys: http://css-tricks.com/snippets/javascript/javascript-keycodes/
+      .filter (key) -> 
+        _.contains(_.union([8, 32], [46..90], [186..192], [219..222]), key)
       .throttle(1500)
       .map (key) ->
         text = t.find('.typeahead').value

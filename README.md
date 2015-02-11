@@ -81,11 +81,10 @@ it works like a charm!
         t = Template.instance()
         
         searchStream = t.keyUp
-          # map to the key name
-          .map (e) -> e.key
-          # non alphanumeric keys are things like "Meta". But
-          # we want to update on "Backspace" still.
-          .filter (key) -> key?.length is 1 or key is "Backspace"
+          .map (e) -> e.which
+          # filter for the relevant keys: http://css-tricks.com/snippets/javascript/javascript-keycodes/
+          .filter (key) -> 
+            _.contains(_.union([8, 32], [46..90], [186..192], [219..222]), key)
           # throttle the stream to every 1.5 seconds
           .throttle(1500)
           .map (key) ->
