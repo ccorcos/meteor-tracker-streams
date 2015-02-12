@@ -1,6 +1,7 @@
 navHeight = 50
 menuWidth = 200
-css('*:not(input):not(textarea)').userSelect('none')
+css('*:not(input):not(textarea)').userSelect('none').boxSizing('border-box')
+
 
 css
   'html body .page':
@@ -30,6 +31,12 @@ css
       lineHeightpx: navHeight
       textAlign: 'center'
       backgroundColor: 'red'
+    '.item':
+      widthpc: 100
+      textAlign: 'center'
+      heightpx: navHeight
+      borderBottom: '1px solid white'
+      lineHeightpx: navHeight
   '.content':
     paddingpx: 10
     position: 'absolute'
