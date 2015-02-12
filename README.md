@@ -135,5 +135,15 @@ computation for a stream's subscription and all of its subscribers.
 
     It would be sweet to recreate underscore or lodash at the same time ;)
 
+- more stream functions
+  - dedupe / skipDuplicates
+  - scan / reduce
+  - zip / merge
+  - takeWhile / while
+  - take, takeNth
+  - fromArray
+
+- aliases
+  - throttle, debounce
 
 
