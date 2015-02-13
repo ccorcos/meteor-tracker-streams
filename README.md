@@ -1,6 +1,6 @@
 # Tracker Streams
 
-This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com). Also checkout the [swipe menu drawer demo](tracker-streams-menu.meteor.com).
+This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com). Also checkout the [swipe menu drawer demo](http://tracker-streams-menu.meteor.com).
 
 If you haven't heard about observable streams, then [check out this talk](https://www.youtube.com/watch?v=XRYN2xt11Ek).
 For a more hands-on introduction, check out [this interactive tutorial](http://jhusain.github.io/learnrx/).
