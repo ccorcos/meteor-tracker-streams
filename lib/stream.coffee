@@ -180,13 +180,20 @@ Tracker.stream::unless = (anotherStream) ->
   self = this
   nextStream = new Tracker.stream()
   @subscribers.push(nextStream)
-  lastValue = undefined
-  nextStream.subscription = Tracker.autorun -> 
-    value = self.get()
+  blockStream = false
+  sub1 = Tracker.autorun ->
     otherValue = anotherStream.get()
-    if value isnt undefined and not otherValue and value isnt lastValue
+    if otherValue
+      blockStream = true
+    else
+      blockStream = false
+
+  sub2 = Tracker.autorun -> 
+    value = self.get()
+    if value isnt undefined and not blockStream
       nextStream.set(value)
-      lastValue = value
+
+  nextStream.subscription
   return nextStream
 
 # Stop on the next event from anotherStream.

@@ -91,16 +91,10 @@ Merge with another stream into a new stream
 Tracker.stream::merge = (anotherStream) ->
 ```
 
-Pipe to a new stream only when another stream is falsy value
+Pipe to a new stream only when another stream is falsy value.
 
 ```coffee
 Tracker.stream::unless = (anotherStream) ->
-```
-
-Pipe to a new stream only when another stream is truthy value
-
-```coffee
-Tracker.stream::onlyWhen = (anotherStream) ->
 ```
 
 Stop on the next event from anotherStream. The following stop events stop after a `Meteor.defer` ensuring that any dependancies will update.

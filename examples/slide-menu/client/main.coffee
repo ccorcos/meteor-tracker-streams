@@ -72,12 +72,11 @@ Template.menu.rendered = ->
   endStream = Tracker.mergeStreams(mouseUp, mouseOffPage, touchEnd, touchCancel, touchLeave)
 
   # create a move stream on demand returning the x position values
-  MoveStream = ->
-    mouseMove = self.eventStream("mousemove", ".page", true)
-      .map (e) -> e.pageX
-    touchMove = self.eventStream("touchmove", ".page", true)
-      .map (e) -> e.originalEvent.touches[0].pageX
-    return Tracker.mergeStreams(mouseMove, touchMove)
+  mouseMove = self.eventStream("mousemove", ".page", true)
+    .map (e) -> e.pageX
+  touchMove = self.eventStream("touchmove", ".page", true)
+    .map (e) -> e.originalEvent.touches[0].pageX
+  moveStream = Tracker.mergeStreams(mouseMove, touchMove)
 
   # create an animation stream to block the start stream from interrupting an animation
   animatingStream = @stream(false)
@@ -88,7 +87,6 @@ Template.menu.rendered = ->
   startStream
     .unless(animatingStream)
     .map (x) ->
-      moveStream = MoveStream()
 
       initLeft = $menu.position().left
       offset = initLeft - x
@@ -123,7 +121,7 @@ Template.menu.rendered = ->
           $menu.velocity({translateX: -menuWidth, translateZ: 0}, {duration: duration, easing: 'ease-out', complete: -> animatingStream.set(false)})
       
       moveStream
-        .stopWhen(endStream, resolve)
+        .takeUntil(endStream, resolve)
         .forEach (x) ->
           # wait for animation to finish
           left = strangle(x + offset, [-menuWidth, 0])

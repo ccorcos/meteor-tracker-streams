@@ -1,6 +1,6 @@
 # Tracker Streams
 
-This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com).
+This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com). Also checkout the [swipe menu drawer demo](tracker-streams-menu.meteor.com).
 
 If you haven't heard about observable streams, then [check out this talk](https://www.youtube.com/watch?v=XRYN2xt11Ek).
 For a more hands-on introduction, check out [this interactive tutorial](http://jhusain.github.io/learnrx/).
@@ -124,6 +124,40 @@ But in the end, we never deal with arrays, just one element at a time.
 subscriptions are created with `Tracker.autorun`. 
 The "completion" of a stream results in stopping the `Tracker.autorun` 
 computation for a stream's subscription and all of its subscribers.
+
+## Performance Advice
+
+I noticed while building the swipe menu that it takes a lot of CPU to bind to an event.
+So while it may seem intuitive that we should only bind to events when we need to and unbind
+them as soon as we don't need them, it costs a lot to do that sometimes. Since the template
+will take care of memory leaks, its often best just create the event streams from the get-go.
+For example:
+
+```coffee
+Template.drag.rendered = ->
+  # create the mouseDown and mouseUp streams that will 
+  # be automatically completed on Template.destroyed.
+  mouseDown = @eventStream("mousedown", ".draggable")
+  mouseUp   = @eventStream("mouseup", ".draggable")
+  mouseMove = @eventStream("mousemove", "*")
+
+  self = this
+  mouseDown.map (e) ->
+    # on each mousedown, get the initial position and the offset of the click
+    $elem = $(e.target)
+    initPos = $elem.position()
+    initOffset = {top: initPos.top - e.pageY, left:initPos.left - e.pageX}
+    # create a new event stream to listen to mousemove until mouseUp
+    mouseMove
+      .takeUntil(mouseUp)
+      .forEach (e) ->
+        # update the position of the element
+        pos = {top: e.pageY, left: e.pageX}
+        $elem.css({top: pos.top + initOffset.top, left: pos.left + initOffset.left})
+```
+
+Thus we are not constantly binding and unbinding events. You can see this the performance profiler
+or your browser's devtools. Also notice we are using `takeUntil` instead of `stopWhen`.
 
 ## To Do
 - error propagation
