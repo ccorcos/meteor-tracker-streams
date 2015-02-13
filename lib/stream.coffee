@@ -22,7 +22,7 @@ Tracker.mergeStreams = (streams...) ->
     do (stream) ->
       stream.subscribers.push(mergedStream)
       sub = Tracker.autorun ->
-        value = stream.value.get()
+        value = stream.get()
         if value isnt undefined
           mergedStream.set(value)
       subs.push(sub)
@@ -164,7 +164,7 @@ Tracker.stream::merge = (anotherStream) ->
 
   anotherStream.subscribers.push(nextStream)
   sub2 = Tracker.autorun -> 
-    value = anotherStream.value.get()
+    value = anotherStream.get()
     if value isnt undefined
       nextStream.set(value)
 
@@ -175,20 +175,35 @@ Tracker.stream::merge = (anotherStream) ->
   nextStream.subscription = sub
   return nextStream
 
+# Pipe to a new stream only when another stream is falsy value
+Tracker.stream::unless = (anotherStream) ->
+  self = this
+  nextStream = new Tracker.stream()
+  @subscribers.push(nextStream)
+  lastValue = undefined
+  nextStream.subscription = Tracker.autorun -> 
+    value = self.get()
+    otherValue = anotherStream.get()
+    if value isnt undefined and not otherValue and value isnt lastValue
+      nextStream.set(value)
+      lastValue = value
+  return nextStream
+
 # Stop on the next event from anotherStream.
 Tracker.stream::stopWhen = (anotherStream, func) ->
   self = this
   first = true
   Tracker.autorun (c) ->
-    value = anotherStream.value.get()
+    value = anotherStream.get()
     if value isnt undefined
       # there may already be a value in another stream, so make sure
       # not to immediately stop the stream.
       unless first
-        self.stop()
-        c.stop()
         val = self.get()
         if func then func(val)
+        # Meteor.defer ->
+        self.stop()
+        c.stop()
     first = false
   return this
 
@@ -196,9 +211,10 @@ Tracker.stream::stopWhen = (anotherStream, func) ->
 Tracker.stream::stopAfterMs = (ms, func) ->
   self = this
   delay ms, ->
-    self.stop()
     value = self.get()
     if func then func(value)
+    Meteor.defer ->
+      self.stop()
   return this
 
 # Stop stream after N values
@@ -210,9 +226,11 @@ Tracker.stream::stopAfterN = (number, func) ->
     if value isnt undefined
       count++
       if count >= number
-        self.stop()
-        c.stop()
         if func then func(value)
+        Meteor.defer ->
+          self.stop()
+          c.stop()
+
   return this
 
 # Alias for stream.copy().stopWhen
@@ -267,6 +285,15 @@ Blaze.TemplateInstance.prototype.eventStream = (eventName, elementSelector, glob
     @view.template.events(evtMap)
     @eventStreams.push(stream)
     return stream
+
+# Create a Blaze prototype for creating streams that automatically stop onDestroyed
+Blaze.TemplateInstance.prototype.stream = (initialValue=undefined) ->
+  unless @eventStreams isnt undefined
+    @eventStreams = []
+
+  stream = new Tracker.stream(initialValue)
+  @eventStreams.push(stream)
+  return stream
 
 # Clean up all the streams when the Template dies thanks to 
 # the template-extentions package

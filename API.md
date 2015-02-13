@@ -24,6 +24,12 @@ A Blaze prototype function for creating event streams that automatically stop on
 Blaze.TemplateInstance.prototype.eventStream = (eventName, elementSelector, global=false) ->
 ```
 
+Create a Blaze prototype for creating streams that automatically stop onDestroyed
+
+```coffee
+Blaze.TemplateInstance.prototype.stream = (initialValue=undefined) ->
+```
+
 Add a value to a stream
 
 ```coffee
@@ -85,7 +91,19 @@ Merge with another stream into a new stream
 Tracker.stream::merge = (anotherStream) ->
 ```
 
-Stop on the next event from anotherStream.
+Pipe to a new stream only when another stream is falsy value
+
+```coffee
+Tracker.stream::unless = (anotherStream) ->
+```
+
+Pipe to a new stream only when another stream is truthy value
+
+```coffee
+Tracker.stream::onlyWhen = (anotherStream) ->
+```
+
+Stop on the next event from anotherStream. The following stop events stop after a `Meteor.defer` ensuring that any dependancies will update.
 
 ```coffee
 Tracker.stream::stopWhen = (anotherStream, func) ->

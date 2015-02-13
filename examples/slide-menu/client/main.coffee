@@ -2,14 +2,9 @@ navHeight = 50
 menuWidth = 200
 css('*:not(input):not(textarea)').userSelect('none').boxSizing('border-box')
 css('.menu').transform("translateX(-#{menuWidth}px)")
+css('html body .page').fp().margin(0)
+
 css
-  'html body .page':
-    margin: 0
-    position: 'absolute'
-    top: 0
-    bottom: 0
-    left: 0
-    right: 0
   '.menu':
     zIndex: 1
     position: 'absolute'
@@ -74,7 +69,7 @@ Template.menu.rendered = ->
   mouseOut  = self.eventStream("mouseout", ".page", true)
   mouseOffPage = mouseOut
     .filter (e) -> (e.relatedTarget or e.toElement) is undefined
-  endStream =  Tracker.mergeStreams(mouseUp, mouseOffPage, touchEnd, touchCancel, touchLeave)
+  endStream = Tracker.mergeStreams(mouseUp, mouseOffPage, touchEnd, touchCancel, touchLeave)
 
   # create a move stream on demand returning the x position values
   MoveStream = ->
@@ -84,43 +79,56 @@ Template.menu.rendered = ->
       .map (e) -> e.originalEvent.touches[0].pageX
     return Tracker.mergeStreams(mouseMove, touchMove)
 
-  # until take works
+  # create an animation stream to block the start stream from interrupting an animation
+  animatingStream = @stream(false)
+
+  # get the jquery object we're going to drag
   $menu = $(@find('.menu'))
 
-  startStream.map (x) ->
-    initLeft = $menu.position().left
-    offset = initLeft - x
-    lastLeft = initLeft
-    velocity = 0
+  startStream
+    .unless(animatingStream)
+    .map (x) ->
+      moveStream = MoveStream()
 
-    # toggle menu position
-    toggle = ->
-      if lastLeft > -menuWidth/2
-        # close it
-        $menu.velocity({translateX: [-menuWidth, 0], translateZ: [0, 0]}, {duration: 400, easing: 'ease-in-out'})
-      else
-        # open it
-        $menu.velocity({translateX: [0, -menuWidth], translateZ: [0, 0]}, {duration: 400, easing: 'ease-in-out'})
+      initLeft = $menu.position().left
+      offset = initLeft - x
+      lastLeft = initLeft
+      velocity = 0
 
-    # resolve menu position
-    resolve = ->
-      if initLeft is lastLeft and velocity is 0
-        toggle()
-        return
+      # toggle menu position
+      toggle = ->
+        if lastLeft > -menuWidth/2
+          # close it
+          $menu.velocity({translateX: [-menuWidth, 0], translateZ: [0, 0]}, {duration: 400, easing: 'ease-in-out', complete: -> animatingStream.set(false)})
+        else
+          # open it
+          $menu.velocity({translateX: [0, -menuWidth], translateZ: [0, 0]}, {duration: 400, easing: 'ease-in-out', complete: -> animatingStream.set(false)})
 
-      momentum = velocity*1
-      if lastLeft + momentum > -menuWidth/2
-        $menu.velocity({translateX: 0, translateZ: 0}, {duration: 400, easing: 'ease-out'})
-      else
-        $menu.velocity({translateX: -menuWidth, translateZ: 0}, {duration: 400, easing: 'ease-out'})
+      # resolve menu position
+      resolve = ->
+        animatingStream.set(true)
+        # wait for animation to finish
+        if initLeft is lastLeft and velocity is 0
+          toggle()
+          return
 
-    # create some streams that will complete themselves   
-    moveStream = MoveStream()
-      .takeUntil(endStream, resolve)
-      .forEach (x) ->
-        left = strangle(x + offset, [-menuWidth, 0])
-        velocity = left - lastLeft
-        lastLeft = left
-        $menu.velocity({translateX: left, translateZ: 0}, {duration: 0})
+        momentum = velocity*3
+        if lastLeft + momentum > -menuWidth/2
+          momentum = Math.abs(momentum)
+          duration = Math.min(-lastLeft/momentum*100, 400)
+          $menu.velocity({translateX: 0, translateZ: 0}, {duration: duration, easing: 'ease-out', complete: -> animatingStream.set(false)})
+        else
+          momentum = Math.abs(momentum)
+          duration = Math.min((200-lastLeft)/momentum*100, 400)
+          $menu.velocity({translateX: -menuWidth, translateZ: 0}, {duration: duration, easing: 'ease-out', complete: -> animatingStream.set(false)})
+      
+      moveStream
+        .stopWhen(endStream, resolve)
+        .forEach (x) ->
+          # wait for animation to finish
+          left = strangle(x + offset, [-menuWidth, 0])
+          velocity = left - lastLeft
+          lastLeft = left
+          $menu.velocity({translateX: left, translateZ: 0}, {duration: 0})
 
 
