@@ -1,21 +1,29 @@
+<head>
+  <meta name="viewport" content="initial-scale=1, user-scalable=no">
+</head>
+
 <body>
   {{>main}}
 </body>
 
 <template name="main">
   <div class="page">
-      <div class="menu">
-        <div class="handle">
-          O
-        </div>
-        <div class="item">item 1</div>
-        <div class="item">item 2</div>
-        <div class="item">item 3</div>
-      </div>
+    {{>menu}}
     <div class="nav"></div>
     <div class="content">
       <p>A swipable menu example using ccorcos:tracker-streams</p>
       <p>Swipe that red square</p>
     </div>
+  </div>
+</template>
+
+<template name="menu">
+  <div class="menu">
+    <div class="handle">
+      O
+    </div>
+    <div class="item">item 1</div>
+    <div class="item">item 2</div>
+    <div class="item">item 3</div>
   </div>
 </template>

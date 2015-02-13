@@ -1,7 +1,7 @@
 Package.describe({
   name: 'ccorcos:tracker-streams',
   summary: 'Observable streams using Tracker.',
-  version: '1.0.0',
+  version: '2.0.0',
   git: 'https://github.com/ccorcos/meteor-tracker-streams'
 });
 

@@ -1,0 +1,3 @@
+# 2.0.0
+
+Updated the API to be more consistent. More explicit about methods that stop the current stream by prefixing those methods with 'stop' whereas methods prefixed with take merely copy the stream and then call the associated stop method. The crucial non-backwards compatibility is the `takeUntil` method which does not stop the current stream. Now you must use `stopWhen` to stop the current stream.

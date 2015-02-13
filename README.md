@@ -54,7 +54,7 @@ Template.drag.rendered = ->
     initOffset = {top: initPos.top - e.pageY, left:initPos.left - e.pageX}
     # create a new event stream to listen to mousemove until mouseUp
     self.eventStream("mousemove", "*")
-      .takeUntil(mouseUp)
+      .stopWhen(mouseUp)
       .forEach (e) ->
         # update the position of the element
         pos = {top: e.pageY, left: e.pageX}
@@ -95,7 +95,7 @@ Template.typeahead.helpers
       .filter (key) -> 
         _.contains(_.union([8, 32], [46..90], [186..192], [219..222]), key)
       # throttle the stream to every 1.5 seconds
-      .throttle(1500)
+      .debounce(1500)
       .map (key) ->
         text = t.find('.typeahead').value
         # Meteor.subscribe("typeahead", text)
@@ -105,7 +105,7 @@ Template.typeahead.helpers
           return []
     
     # return the latest value in the searchStream
-    searchStream.value.get()
+    searchStream.get()
 ```
 
 As you can see, we once again eliminated a lot of state from out template.
@@ -130,20 +130,3 @@ computation for a stream's subscription and all of its subscribers.
 
     I haven't come up with a good example to use this yet, but when I do
     I will implement them.
-
-- use [transducers](http://jlongster.com/Transducers.js--A-JavaScript-Library-for-Transformation-of-Data) to create more high order functions.
-
-    It would be sweet to recreate underscore or lodash at the same time ;)
-
-- more stream functions
-  - dedupe / skipDuplicates
-  - scan / reduce
-  - zip / merge
-  - takeWhile / while
-  - take, takeNth
-  - fromArray
-
-- aliases
-  - throttle, debounce
-
-
