@@ -3,13 +3,13 @@
 This package uses Tracker to build "observable streams" for Meteor. [Check out the live demo](http://tracker-streams.meteor.com). Also checkout the [swipe menu drawer demo](http://tracker-streams-menu.meteor.com).
 
 If you haven't heard about observable streams, then [check out this talk](https://www.youtube.com/watch?v=XRYN2xt11Ek).
-For a more hands-on introduction, check out [this interactive tutorial](http://jhusain.github.io/learnrx/).
+For a more hands on introduction, check out [this interactive tutorial](http://jhusain.github.io/learnrx/).
 
 ## Getting Started
 
     meteor add ccorcos:tracker-streams
 
-You can create you're own stream using
+You can create your own stream using
 
 ```coffee
 numbers = Tracker.stream()
@@ -130,7 +130,7 @@ computation for a stream's subscription and all of its subscribers.
 I noticed while building the swipe menu that it takes a lot of CPU to bind to an event.
 So while it may seem intuitive that we should only bind to events when we need to and unbind
 them as soon as we don't need them, it costs a lot to do that sometimes. Since the template
-will take care of memory leaks, its often best just create the event streams from the get-go.
+will take care of memory leaks, it's often best just create the event streams from the get go.
 For example:
 
 ```coffee
